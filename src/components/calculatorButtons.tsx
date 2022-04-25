@@ -1,17 +1,45 @@
 import React, {FunctionComponent} from "react";
-import Grid from '@mui/material/Grid';
-import Styled from 'styled-components';
 import Button from '@mui/material/Button';
+import { createTheme, ThemeProvider } from '@mui/material/styles';
 
-// const StyledButton = Styled(Button)`
-// background-color: #FF0000;
-// border-radius: 50px;
-// border: none;
-// padding: 10px;
-// font-size: 400px;
-// `;
-
-
+const theme = createTheme({
+    palette: {
+      neutral: {
+        main: '#a9a9a9',
+        contrastText: '#fff',
+      },
+     primary:{
+        main: '#BE302B',
+        contrastText: '#fff'
+    },
+    secondary:{
+        main:'#f07995',
+        contrastText: '#fff'
+    },
+    info:{
+        main: '#Be3B45',
+        contrastText: '#fff'
+    }
+    },
+  });
+  
+  declare module '@mui/material/styles' {
+    interface Palette {
+      neutral: Palette['primary'];
+    }
+  
+    // allow configuration using `createTheme`
+    interface PaletteOptions {
+      neutral?: PaletteOptions['primary'];
+    }
+  }
+  
+  // Update the Button's color prop options
+  declare module '@mui/material/Button' {
+    interface ButtonPropsColorOverrides {
+      neutral: true;
+    }
+  }
 
 interface buttonProps {
     label: string,
@@ -20,16 +48,43 @@ interface buttonProps {
 
 const calculatorButtons:FunctionComponent<buttonProps> = ({label, styleType}) => {
     if (styleType === "big"){
-       return (<Button variant="contained" color="success">
+       return (
+        <ThemeProvider theme={theme}>
+       <Button variant="contained" color="primary">
             {label}
-        </Button>)
+        </Button>
+        </ThemeProvider>
+        
+        )
+    }
+    else if(styleType === "c"){
+        return (
+            <ThemeProvider theme={theme}>
+           <Button variant="contained" color="info">
+                {label}
+            </Button>
+            </ThemeProvider>
+            
+            )
+    }
+    else if(styleType === "other"){
+        return (
+            <ThemeProvider theme={theme}>
+           <Button variant="contained" color="secondary">
+                {label}
+            </Button>
+            </ThemeProvider>
+            
+            )
     }
     return(
-
         //variant="contained" color={styleType === "big" ? "success" : undefined}
-        <Button>
+
+        <ThemeProvider theme={theme}>
+        <Button variant="contained"  color="neutral">
             {label}
-        </Button>    
+        </Button>   
+        </ThemeProvider> 
     )
 }
 
