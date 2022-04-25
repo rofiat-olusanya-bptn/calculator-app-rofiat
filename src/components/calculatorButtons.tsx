@@ -27,7 +27,7 @@ const calculatorButtons:FunctionComponent<buttonProps> = ({label, styleType}) =>
     return(
 
         //variant="contained" color={styleType === "big" ? "success" : undefined}
-        <Button >
+        <Button>
             {label}
         </Button>    
     )
