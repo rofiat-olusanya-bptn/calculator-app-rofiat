@@ -1,106 +1,223 @@
 import React, { useState } from "react";
-import Paper from "@mui/material/Paper";
-import Styled from "styled-components";
-import CalculatorButtons from "./calculatorButtons";
-import CalculatorDisplay from "./calculatorDisplay";
-import Box from "@mui/material/Box";
-import Calc, {
-  CalcInput,
-  InputType,
-  Operation,
-  OperatorType,
-} from "../modules/mathCalc";
+import {
+  Paper,
+  Box,
+  Grid,
+  Switch,
+  ThemeProvider, 
+  createTheme
+} from "@mui/material";
+import CalculatorDisplay from "../components/CalculatorDisplay";
+import { buttonArray, operationsArray, numbersArray } from "./ButtonArray";
+import styled from "styled-components";
 
-const Grid = Styled.div`
-display: grid;
-grid-gap: 10px;
-grid-template-columns: repeat(4, 80px);
-grid-teplate-rows: repeat(5, 80px);
-`;
+const GDisplay = styled(Grid)`
+border: 2px solid black;
+color: #B0B8B4FF;
+border-radius: 8px;
+margin: 1500px;
+background-color: #184A45FF;
 
-function CalculatorCard() {
-  const [inputs, setInputs] = useState<Array<CalcInput>>([]);
-  const state = Calc.getState(inputs);
+&:hover {
+  cursor: pointer;
+}
+`
 
-  const appendInput = (input: CalcInput): void => {
-    setInputs((prev) => [...prev, input]);
+
+const CalculatorCard = () => {
+  const [inputs, setInputs] = useState("0");
+  const [darkMode, setDarkMode] = useState(false)
+
+  const theme = createTheme({
+    palette: {
+     mode: darkMode ? "dark" : "light",
+    },           
+  })
+
+  const replaceLastItemInState = (val: any) => {
+    const currentInput = inputs.toString();
+    const updatedInput = currentInput.slice(0, -1) + `${val}`;
+    setInputs(updatedInput);
+    return;
   };
 
-  const handleNumerical = (value: number) => () => {
-    appendInput({ type: InputType.Numerical, value });
+  const appendToState = (val: any) => {
+    const currentInput = inputs.toString();
+    const updatedInput = currentInput + `${val}`;
+    setInputs(updatedInput);
+    return;
   };
 
-  const handleOperator = (operator: OperatorType) => () => {
-    appendInput({ type: InputType.Operator, operator });
+  const handleResultLogic = () => {
+    const lastInputVal = inputs.slice(-1);
+
+    const secondLastInputVal = inputs.slice(-2, -1);
+
+    if (inputs === "0") {
+      return;
+    }
+
+    if (secondLastInputVal === "/" && lastInputVal === "0") {
+      return;
+    }
+
+    if(operationsArray?.includes(lastInputVal)){
+      if (inputs.length === 1 && operationsArray.includes(inputs)) {
+        return;
+      }
+    }
+    
+
+    if (operationsArray.includes(lastInputVal)) {
+      return;
+    }
+
+    if (numbersArray.includes(lastInputVal)) {
+      const result = eval(inputs);
+      setInputs(result.toString());
+      return;
+    }
   };
 
-  const handleClear = () => setInputs([]);
+  const handleButtonclick = (value: any) => {
+    if (value === "=") {
+      handleResultLogic();
+      return;
+    }
 
-  const handleDelete = () => setInputs((prev) => prev.slice(0, -1))
+    if (value === "C" && inputs!== "0"){
+      setInputs("0")
+      return;
+    }
+
+    if (value === "%" && inputs!== "0"){
+      const divide:any = inputs;
+      setInputs((divide/100).toString())
+      return;
+    }
+    if(value === "√" && inputs !== "0"){
+      let squareroot:any = inputs;
+      setInputs(Math.sqrt(squareroot).toString())
+      return
+    }
+    if(value === "⌫" && inputs !== "0"){
+      setInputs((prev) => (prev.slice(0, -1)))
+      return;
+    }
+
+    if (inputs.length === 1 && numbersArray.includes(value) && inputs === "0") {
+      replaceLastItemInState(value);
+      return;
+    }
+    if (inputs === "0" && value === "-") {
+      setInputs(value);
+      return;
+    }
+    if (inputs.length === 1 && operationsArray.includes(inputs)) {
+      if (operationsArray.includes(value) && value !== "-") {
+        return;
+      }
+    }
+
+    if (inputs === "0") {
+      if (operationsArray.includes(value) && value !== "-") {
+        return;
+      }
+    }
+
+    const lastInputVal = inputs.slice(-1);
+    const secondLastInputVal = inputs.slice(-2, -1);
+    if (operationsArray.includes(value)) {
+      if (value === lastInputVal) {
+        return;
+      }
+      
+      if (
+        (secondLastInputVal === "/" || secondLastInputVal === "*") &&
+        lastInputVal === "-" &&
+        operationsArray.includes(value)
+      ) {
+        return;
+      }
+      if ((lastInputVal === "*" || lastInputVal === "/") && value === "-") {
+        appendToState(value);
+        return;
+      }
+
+      if (
+        operationsArray.includes(lastInputVal) &&
+        value !== lastInputVal &&
+        operationsArray.includes(value)
+      ) {
+        replaceLastItemInState(value);
+        return;
+      } else {
+        appendToState(value);
+        return;
+      }
+    }
+    if (inputs.length >= 0 && numbersArray.includes(value)) {
+      if (inputs === "0") {
+        setInputs(value);
+        return;
+      }
+      if (
+        operationsArray.includes(secondLastInputVal) &&
+        lastInputVal === "0" &&
+        numbersArray.includes(value)
+      ) {
+        replaceLastItemInState(value);
+        return;
+      }
+      appendToState(value);
+      return;
+    }
+  };
 
   return (
+<ThemeProvider  theme={theme}>
+<Switch checked={darkMode} onChange={() => setDarkMode(!darkMode)}/>
     <Box
       sx={{
+        flexGrow: 1,
         display: "flex",
         justifyContent: "center",
         alignItems: "center",
-        margin: 5,
         "& > :not(style)": {
-          m: 1,
           width: 400,
-          height: 450,
-          py: 3,
-          px: 3,
+          height: 600,
         },
       }}
     >
       <Paper elevation={3}>
-        <Grid>
-          <CalculatorDisplay label={state.displayValue} />
-          <CalculatorButtons styleType="c" label="C" onClick={handleClear} />
-          <CalculatorButtons styleType="other" label="(" />
-          <CalculatorButtons styleType="other" label=")" />
-          <CalculatorButtons
-            styleType="other"
-            label="x"
-            onClick={handleOperator(OperatorType.Multiply)}
-          />
-          <CalculatorButtons label="7" onClick={handleNumerical(7)} />
-          <CalculatorButtons label="8" onClick={handleNumerical(8)} />
-          <CalculatorButtons label="9" onClick={handleNumerical(9)} />
-          <CalculatorButtons
-            styleType="other"
-            label="÷"
-            onClick={handleOperator(OperatorType.Divide)}
-          />
-          <CalculatorButtons label="4" onClick={handleNumerical(4)} />
-          <CalculatorButtons label="5" onClick={handleNumerical(5)} />
-          <CalculatorButtons label="6" onClick={handleNumerical(6)} />
-          <CalculatorButtons
-            styleType="other"
-            label="-"
-            onClick={handleOperator(OperatorType.Subtract)}
-          />
-          <CalculatorButtons label="1" onClick={handleNumerical(1)} />
-          <CalculatorButtons label="2" onClick={handleNumerical(2)} />
-          <CalculatorButtons label="3" onClick={handleNumerical(3)} />
-          <CalculatorButtons
-            styleType="other"
-            label="+"
-            onClick={handleOperator(OperatorType.Add)}
-          />
-          <CalculatorButtons label="." />
-          <CalculatorButtons label="0" onClick={handleNumerical(0)} />
-          <CalculatorButtons label="⌫" onClick={handleDelete} />
-          <CalculatorButtons
-            styleType="big"
-            label="="
-            onClick={handleOperator(OperatorType.Equals)}
-          />
+        <CalculatorDisplay label={inputs} theme={theme} />
+        <Grid
+          container
+          rowSpacing={{ xs: 1, sm: 2, md: 3 }}
+          columnSpacing={{ xs: 1, sm: 2, md: 3 }}
+          spacing={2}
+          paddingY={3}
+          paddingX={5}
+          fontSize={30}
+        >
+          {buttonArray.map((item, index) => {
+            return (
+              <GDisplay
+                item
+                xs={3}
+                key={index}
+                onClick={() => handleButtonclick(item.value)}
+              >
+                  {item.value}
+                
+              </GDisplay>
+            );
+          })}
         </Grid>
       </Paper>
     </Box>
+    </ThemeProvider>
   );
-}
+};
 
 export default CalculatorCard;
