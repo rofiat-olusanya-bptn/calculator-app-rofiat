@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React from 'react';
 import CalculatorCard from "./components/CalculatorCard"
 import './App.css';
 import { Container } from "@mui/material";
@@ -6,9 +6,6 @@ import { BrowserRouter as Router, Routes, Route} from "react-router-dom"
 import NotFound from './components/NotFound';
 
 function App() {
-  
-
-  
 
   return (
     <div>
@@ -19,7 +16,6 @@ function App() {
           <Route path="*" element={<NotFound/>} />
       </Routes>
       </Container>
-
     </Router>
     </div>
   );

@@ -23,7 +23,7 @@ const ToOther = styled(Link)`
 const NotFound = () => {
   return (
     <div>
-      <img src="https://images.unsplash.com/photo-1439853949127-fa647821eba0?ixlib=rb-1.2.1&ixid=MnwxMjA3fDB8MHxzZWFyY2h8MjJ8fG5hdHVyZXxlbnwwfHwwfHw%3D&auto=format&fit=crop&w=700&q=60" />
+      <img src="https://images.unsplash.com/photo-1439853949127-fa647821eba0?ixlib=rb-1.2.1&ixid=MnwxMjA3fDB8MHxzZWFyY2h8MjJ8fG5hdHVyZXxlbnwwfHwwfHw%3D&auto=format&fit=crop&w=700&q=60" alt="sea" />
       <Title>404 Error</Title>
       <Other>Page Not Found.</Other>
       <ToOther to="/">Go Home</ToOther>
